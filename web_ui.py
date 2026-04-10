@@ -471,16 +471,13 @@ async def monitor_loop():
                     
                     state.first_run_cycles[query] = False
 
-            # Launch all searches concurrently with a small stagger to prevent rate-limiting spikes
+            # Execute queries sequentially with longer delays to avoid IP bans
             import random
-            tasks = []
             for query in queries_to_run:
                 if not state.running: break
-                tasks.append(asyncio.create_task(process_query(query)))
-                await asyncio.sleep(random.uniform(1.5, 3.0))
-                
-            if tasks:
-                await asyncio.gather(*tasks)
+                await process_query(query)
+                # Sleep aggressively between 5 and 10 seconds between searches
+                await asyncio.sleep(random.uniform(5.5, 9.5))
                 
             logger.info(f"Cycle complete. Sleeping for {POLL_INTERVAL} seconds.")
             state.is_scraping = False
