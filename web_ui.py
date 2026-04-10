@@ -308,16 +308,28 @@ async def fetch_vinted_items(client: httpx.AsyncClient, search_term: str) -> lis
         params = {"search_text": search_term, "order": "newest_first"}
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "application/json"
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+        "Referer": "https://www.vinted.co.uk/"
     }
 
     try:
         response = await client.get(VINTED_API_URL, params=params, headers=headers)
         
         if response.status_code in (401, 403):
-            logger.warning(f"{response.status_code} Unauthorized/Forbidden: Missing valid session cookie.")
-            return []
+            logger.warning(f"{response.status_code} Unauthorized/Forbidden: Missing valid session cookie. Attempting to refresh cookie...")
+            await client.get("https://www.vinted.co.uk/", headers={
+                "User-Agent": headers["User-Agent"],
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
+            })
+            response = await client.get(VINTED_API_URL, params=params, headers=headers)
+            
+            if response.status_code in (401, 403):
+                logger.warning("Still 403. Render's IP might be blocked by Cloudflare, or headers need further refinement.")
+                return []
+                
         if response.status_code == 429:
             logger.warning("429 Too Many Requests: Rate limited.")
             await asyncio.sleep(60)
@@ -353,7 +365,11 @@ async def monitor_loop():
     async with httpx.AsyncClient(mounts=proxy_mounts, follow_redirects=True) as client:
         try:
             logger.info("Fetching initial session cookies from Vinted homepage...")
-            await client.get("https://www.vinted.co.uk/", headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+            await client.get("https://www.vinted.co.uk/", headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
+            })
         except Exception as e:
             logger.warning(f"Failed to get initial cookies: {e}")
 
