@@ -24,7 +24,7 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 PROXY_URL = os.getenv("PROXY_URL")
-POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 15))
+POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 45))
 VINTED_API_URL = "https://www.vinted.co.uk/api/v2/catalog/items"
 
 # Configure Logging
@@ -47,7 +47,20 @@ class BotState:
     force_scrape: bool = False
     first_run_cycles = {} # Track which queries have been primed
     recent_gems = [] # Track recent alerts for the UI
-    search_queries = []
+    search_queries = [
+        "Vintage Ring",
+        "9ct gold",
+        "opal ring vintage",
+        "job lot jewellery",
+        "vintage jewellery collection",
+        "Antique Jewellery",
+        "old ring",
+        "vintage jewellery job lot",
+        "gold stech bracelet",
+        "shell bag vintage",
+        "art deco ring",
+        "9ct old ring"
+    ]
     negative_filters = []
 
     @property
@@ -384,7 +397,7 @@ async def monitor_loop():
             # Work on a copy of search queries in case UI changes them mid-flight
             queries_to_run = list(state.search_queries)
             
-            sem = asyncio.Semaphore(5) # Max 5 concurrent HTTP requests to Vinted
+            sem = asyncio.Semaphore(2) # Max 2 concurrent HTTP requests to Vinted
             
             async def process_query(query):
                 async with sem:
@@ -459,11 +472,12 @@ async def monitor_loop():
                     state.first_run_cycles[query] = False
 
             # Launch all searches concurrently with a small stagger to prevent rate-limiting spikes
+            import random
             tasks = []
             for query in queries_to_run:
                 if not state.running: break
                 tasks.append(asyncio.create_task(process_query(query)))
-                await asyncio.sleep(0.3)
+                await asyncio.sleep(random.uniform(1.5, 3.0))
                 
             if tasks:
                 await asyncio.gather(*tasks)
