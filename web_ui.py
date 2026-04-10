@@ -41,7 +41,7 @@ class BotState:
     alerts_sent = 0
     min_price: float = 0.0
     max_price: float = 100.0
-    buffer_mins: int = 30
+    buffer_mins: int = 20
     next_refresh_ts: float = 0.0
     is_scraping: bool = False
     force_scrape: bool = False
@@ -181,7 +181,10 @@ async def send_telegram_alert(bot: Bot, item: dict, query_tag: str, send_msg: bo
 
     # Attempt to extract publish date if available
     publish_str = "Unknown"
-    created_ts = item.get("created_at_ts") or item.get("updated_at_ts")
+    created_ts = item.get("created_at_ts")
+    if not created_ts and "photo" in item and "high_resolution" in item["photo"]:
+        created_ts = item["photo"]["high_resolution"].get("timestamp")
+        
     if created_ts:
         try:
             from datetime import timezone
@@ -216,7 +219,7 @@ async def send_telegram_alert(bot: Bot, item: dict, query_tag: str, send_msg: bo
 
     # Calculate actual timestamp and numeric price for sorting/frontend relative time
     item_ts = 0.0
-    ct = item.get("created_at_ts") or item.get("updated_at_ts")
+    ct = item.get("created_at_ts")
     pt = item.get("photo", {}).get("high_resolution", {}).get("timestamp")
     # Take whichever is valid
     if ct:
@@ -419,6 +422,29 @@ async def monitor_loop():
                     for item in items:
                         item_id = str(item.get("id"))
                         if not item_id or is_item_seen(item_id):
+                            continue
+                        
+                        # Enforce strict freshness (< 20 mins)
+                        # Use created_at_ts to avoid seeing old items bumped to the top
+                        item_ts = item.get("created_at_ts")
+                        if not item_ts and "photo" in item and "high_resolution" in item["photo"]:
+                            item_ts = item["photo"]["high_resolution"].get("timestamp")
+                        
+                        is_fresh = False
+                        if item_ts:
+                            try:
+                                ts_val = float(item_ts)
+                                if ts_val > 9999999999: 
+                                    ts_val /= 1000
+                                from datetime import datetime, timezone
+                                time_diff = datetime.now(timezone.utc).timestamp() - ts_val
+                                if -600 <= time_diff <= (state.buffer_mins * 60): # strictly within last buffer_mins
+                                    is_fresh = True
+                            except:
+                                pass
+                                
+                        if not is_fresh:
+                            mark_item_seen(item_id)
                             continue
                         
                         if meets_criteria(item, query):
