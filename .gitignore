@@ -1,17 +1,6 @@
-# Environments
-venv/
-.venv/
-env/
 __pycache__/
 *.pyc
-
-# Local Data
-*.db
-items.db
-
-# Secrets
+venv/
 .env
-.env.local
-
-# OS
+items.db
 .DS_Store
