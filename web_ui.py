@@ -165,7 +165,7 @@ def escape_markdown(text: str) -> str:
         text = text.replace(char, f"\\{char}")
     return text
 
-async def send_telegram_alert(bot: Bot, item: dict, query_tag: str):
+async def send_telegram_alert(bot: Bot, item: dict, query_tag: str, send_msg: bool = True):
     title = escape_markdown(item.get("title", "No Title"))
     
     price_data = item.get("price")
@@ -270,13 +270,14 @@ async def send_telegram_alert(bot: Bot, item: dict, query_tag: str):
     }
     state.recent_gems.insert(0, new_gem)
     state.recent_gems = state.recent_gems[:50] # Keep last 50
-    state.alerts_sent += 1
-
-    try:
-        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode=ParseMode.MARKDOWN_V2)
-        logger.info(f"Alert sent for item {item.get('id')}")
-    except TelegramError as e:
-        logger.error(f"Failed to send Telegram message: {e}")
+    
+    if send_msg and bot:
+        state.alerts_sent += 1
+        try:
+            await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode=ParseMode.MARKDOWN_V2)
+            logger.info(f"Alert sent for item {item.get('id')}")
+        except TelegramError as e:
+            logger.error(f"Failed to send Telegram message: {e}")
 
 async def fetch_vinted_items(client: httpx.AsyncClient, search_term: str) -> list:
     import urllib.parse
@@ -420,53 +421,10 @@ async def monitor_loop():
                         if not item_id or is_item_seen(item_id):
                             continue
                         
-                        is_recently_published = False
-                        item_ts = item.get("created_at_ts") or item.get("updated_at_ts")
-                        if not item_ts and "photo" in item and "high_resolution" in item["photo"]:
-                            item_ts = item["photo"]["high_resolution"].get("timestamp")
-                            
-                        if item_ts:
-                            if item_ts > 9999999999: 
-                                item_ts /= 1000
-                            from datetime import datetime, timezone
-                            time_diff = datetime.now(timezone.utc).timestamp() - item_ts
-                            if -600 <= time_diff <= (state.buffer_mins * 60): # allow 10min future drift
-                                is_recently_published = True
-                            
-                        # Skip items older than buffer minutes ALWAYS, regardless of first run or not.
-                        if not is_recently_published:
-                            mark_item_seen(item_id)
-                            continue
-                            
                         if meets_criteria(item, query):
-                                logger.info(f"Item met criteria! (Recently pub: {is_recently_published}, First run: {is_first_run_for_query}) ID: {item_id}")
-                                if bot:
-                                    await send_telegram_alert(bot, item, query)
-                                else:
-                                    logger.info(f"DRY RUN: Would have sent alert for {item.get('title')}")
-                                    state.alerts_sent += 1
-                                    
-                                    # Store for DRY RUN dashboard as well
-                                    item_ts = item.get("created_at_ts") or item.get("updated_at_ts")
-                                    if not item_ts and "photo" in item and "high_resolution" in item["photo"]:
-                                        item_ts = item["photo"]["high_resolution"].get("timestamp")
-                                    if item_ts and item_ts > 9999999999: item_ts /= 1000
-                                    
-                                    price_data = item.get("price")
-                                    p = price_data.get("amount", "0") if isinstance(price_data, dict) else str(price_data)
-                                    curr = price_data.get("currency_code", "EUR") if isinstance(price_data, dict) else "EUR"
-                                    
-                                    state.recent_gems.insert(0, {
-                                        "title": item.get("title", "No Title"),
-                                        "query_tag": query,
-                                        "price": f"{p} {curr}",
-                                        "price_numeric": float(p) if p else 0,
-                                        "url": item.get("url", ""),
-                                        "photo": item.get("photo", {}).get("url") if "photo" in item else None,
-                                        "publish_date": "Just now",
-                                        "timestamp": item_ts
-                                    })
-                                    state.recent_gems = state.recent_gems[:50]
+                            logger.info(f"Item met criteria! (First run: {is_first_run_for_query}) ID: {item_id}")
+                            # Do not send Telegram alerts on the very first run (priming), but add to UI
+                            await send_telegram_alert(bot, item, query, send_msg=not is_first_run_for_query)
                         mark_item_seen(item_id)
                     
                     state.first_run_cycles[query] = False
