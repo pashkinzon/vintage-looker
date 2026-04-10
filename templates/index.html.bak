@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-50 antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinted Gem Alert Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .pulse-green { animation: pulse-green 2s infinite; }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-<!DOCTYPE html>
+<html lang="en" cla"f<html lang="end:<head>
+    <meta charset="UTF-8">
+    <meta nam6     <bo    <meta name="viewport"
+     <title>Vinted Gem Alert Dashboard</title>
+    <script src="https://cdss    <script src="https://cdn.tailwindcss.come-    <link href="https://cdnjs.cloudflare.com/ajaxndigo-2    <script src="https://cdn.jsss="fa-solid fa-gem text-3xl"></i>
+                </div>
+                <div    <style>
+        .pulse-green { animation: pulse-green 2s infinite;ac        .p">        @keyframes pulse-green {
+            0% { box-shadom       edium text-slate-500 mt-1">            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0)v>            100% { box-shadow: 0 0 0 0 rg    <!-- Global Status B        }
+        .glass-card { background: rgba(255, 255, 25s-        6     </style>
+</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w-6xl mx-auto  t        
+        <!-<!DOCTYPE html>
+<html lang="en" St     /spa<html lang="en" cla"f<htmiv    <meta charset="UTF-8">
+    <meta na         <meta nam6     <bo   at     <title>Vinted Gem Alert Dashboard</title>en    <script src="https://cdss    <script srcsla                </div>
+                <div    <style>
+        .pulse-green { animation: pulse-green 2s infinite;ac        .p">        @keyframes pulse-green {
+            0% { box-shadom       eif                <div ST        .pulse-green { animati              0% { box-shadom       edium text-slate-500 mt-1">            70% { box-shadow: 0 0 0 10px rat        .glass-card { background: rgba(255, 255, 25s-        6     </style>
+</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-a c<body fa    <div class="max-w-6xl mx-auto-  <bo  <body       <div class="t" class="font        <!-<!DOCTYPE html>
+<html lang="en" St     /spa<h  <html lang="en" St     /s      <meta na         <meta nam6     <bo   at     <title>Vinted Gem Alert Dashbola                <div    <style>
+        .pulse-green { animation: pulse-green 2s infinite;ac        .p">        @keyframes pulse-green {
+            0% { box-sh="        .pulse-green { animatter            0% { box-shadom       eif                <div ST        .pulse-green { animati             -6</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-a c<body fa    <div class="max-w-6xl mx-auto-  <bo  <body       <div class=nc<body st    <div class="max-w-6xl mx-auto-ju<bo  <body       <div class="max-w c</heat-<body class="text-slate-800 pb-20">
+    <dos    <div class="max-w-6xl mx-a c<bfo<html lang="en" St     /spa<h  <html lang="en" St     /s      <meta na         <meta nam6     <bo   at     <title>Vinted Gem Alert Dashbola      <        .pulse-green { animation: pulse-green 2s infinite;ac        .p">        @keyframes pulse-green {
+            0% { box-sh="        .pulse-green { animatter                     0% { box-sh="        .pulse-green { animatter            0% { box-shadom       eif         ic<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-auto-sl<bo  <body       <div class="max-w c</hea  <body class="text-slate-800 pb-20">
+    <d-s    <div class="max-w-6xl mx-a c<ber    <dos    <div class="max-w-6xl mx-a c<bfo<html lang="en" St     /spa<h  <html lang="en" St     /s      <meta na         <meta nam6     <bo   at     <title>Vinted Gem Alert Dashbola      <        .pulse-green { animation: p                0% { box-sh="        .pulse-green { animatter                     0% { box-sh="        .pulse-green { animatter            0% { box-shadom       eif         ic<body class="text-slate-800 pb-20">
+    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</hea <di    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-auto-sl<bo  <body       <div class="max-w   <bo  <body       <div class="max-w c</heaiv<body class="text-slate-800 pb-20">
+    <d      <div ro    <div class="max-w-6.5    <d-s    <div class="max-w-6xl mx-a c<ber    <dos    <div class="max-w-6xl mx-a c<bfo<html lang="en" St     /spa<h  <html s    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</hea <di    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-auto-sl<bo  <body       <div class="max-w   <bo  <body       <div class="max-w c</heaiv<body class="text-slate-800 pb-20">
+    <d      <div ro    <div class="max-w-6.5    <d-s    <div class="max-w-6xl mx-a c<ber    <dos    <div <<bo  <body       <div class="max-w c</hea  <bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <d  <body class="text-slate-800 pb-20">
+    <dyp    <div ro    <div class="max-w-601    <d      <div ro    <div class="max-w-6.5    <d-s    <div class="max-w-6xl mx-a c<ber    <dos    <div class="max-w-6xl mx-a c<bfo<html lang="en" St     /spa<hus<bo  <body       <div class="max-w c</hea <di    <div class="max-w-6xl mx-auto-c</head>
+<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-autbm<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div class="max-w-6s
+    <d      <div ro    <div class="max-w-6.5    <d-s    <div class="max-w-6xl mx-a c<ber    <dos    <div <<bo  <body       <div class="max-w c</hea  <bo  <body  rd<body class="text-slate-800 pb-20">
+    <d  <body class="text-slate-800 pb-20">
+    <dyp    <div ro    <div class="max-w-601    <d      <div ro    <div class="max-w-6.5    <d-s    <div class=it    <d  <body class="text-slate-80      <dyp    <div ro    <div class="max-w-6="<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-autbm<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div class="max-w-6s
+ a<body class="text-slate-800 pb-20">
+    <de     <div ro    <div class="max-w-6  <body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d       <dxl<body class="text-slate-8_fi    <d      <div ro    <div class="max-w-6 c    <d      <div ro    <div class="max-w-63     <d  <body class="text-slate-800 pb-20">
+    <dyp    <div ro    <div class="max-w-601    <d      <div ro    <div class="max-w-6.5    <d-s    <div class=it    <d  <body class="text-slate-80      {     <dy)" class="hover:text-rose-900 opacity<body class="text-slate-800 pb-20">
+    <div ro    <div class="max-w-6xl mx-autbm<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div cl      <div ro    <div class="max-w-6te<body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d nd    <dxl<body class="text-slate-80iv    <d      <div ro    <div class="maxmit="a a<body class="text-slate-800 pb-20">
+          <de     <div ro    <div class="mte    <dxl<body class="text-slate-800 pb-20">
+    <d       <dxl<body class="textd-    <d       <dxl<body class="text-slate-8oc    <dyp    <div ro    <div class="max-w-601    <d      <div ro    <div class="max-w-6.5    <d-s    <div class=it    <d  <body class="text-slate-80      {     <dy)" class="hov0     <div ro    <div class="max-w-6xl mx-autbm<bo  <body       <div class="max-w c</head>
+<body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div cl      <div ro    <div class="max-w  <body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d      <div ro    <div cl      <div r <    <dxl<body class="text-slate-800 pb-20">
+    <d nd    <dxl<body class="text-slate-80iv    <d      <ol    <d nd    <dxl<body class="text-slate-8go          <de     <div ro    <div class="mte    <dxl<body class="text-slate-800 pb-20">
+    <d       <dxl<body class="textd- en    <d       <dxl<body class="textd-    <d       <dxl<body class="text-slate-8oc    <dd <body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div cl      <div ro    <div class="max-w  <body class="text-slate-800 pb-20">
+    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d      <div ro    <div cl      <div r <    <dxl<body class="text-sla <    <dxl<body class="text-slate-80      <d      <div ro    <div cl      <div rx-    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d     qu    <d um    <dxl<body class="text-slate-8fi    <d nd    <dxl<body class="text-slate-80iv    <d      <ol    <d nd    <dxl<body class="text-slate-8go          <de     <div ro  p-    <d       <dxl<body class="textd- en    <d       <dxl<body class="textd-    <d       <dxl<body class="text-slate-8oc    <dd <body class="text-slate-800 pb-20">
+    <dxl<body class="text-sd-    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div cl      <div ro    <div class="max-w  <body class="text-slate-800 pb-20">
+    <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt    <d um    <dxl<body class="text-slate-80 <    <d     qu    <d um    <dxl<body class="text-slate-8fi    <d nd    <dxl<body class="text-slate-80iv    <d      <ol    <d nd    <dxl<body class="text-slate-8go          <de     <div ro  p-    <d at    <dxl<body class="text-sd-    <dxl<body class="text-slate-800 pb-20">
+    <d      <div ro    <div cl      <div ro    <div class="max-w  <body class="text-slate-800 pb-20">
+    <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt    <d um    < b    <d      <div ro    <div cl      <div ro    <div class="max-w  <bodyNo    <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-800 pb-      <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8    <    <d      <div ro    <div cl      <div ro    <div class="max-w  <body class="text-slate-800 pb-20">
+    <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt    <d um    < b    <d      <div ro    <div cl      <div ro    <div class="max-w  <bodyNo    <dxl<body c          <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-id="new-q    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt in    <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-800 pb-20">
+    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt    <d um    < b    <d      <div ro    <div cl      <div ro    <div class="max-w  <bodyNo    <dxl<body c          <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-id="new-q    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<bod      <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt       <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<body class="text-slate-8xt    <d um    < b    <d      <div ro    <div cl      <div ro    <div class="max-w  <bodyNo    <dxl<body c          <dxl<body c                               <i class="fa-so    <dxl<body class="text-slate-id="new-q    <d um    <dxl<body class="text-slate-80 <    <d           <d um    <dxl<bod      <d um    <dxl<body class="text-slate-80 <    <d        let options = { method: method };
+            if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if (data) {
+                        if                        oa             }
+
+        async functi                        if (data)                           if (data) ri                        if (data)  }                        if (data) el                        if (data) nc                        if (data) e.                        if (data) t                         if (data) ew-negative');
+            if (!input.                        if (data) co                        if (dataativ                        if (data) ;
+                        if (data) ad                        if (data) io                        if (data)                           if (data) at                        if (data) );                        if (data) oa                        if (data) ti                        if (data) pr                        if (data) mi                        if (data) pr                        if (data) P                         if (data) ce      ue;
+            const res = aw                        if         m
+        async functi                        if (data)                     Toast.fire({
+                    icon: 'success',
+                    title: 'Price boundaries saved!'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

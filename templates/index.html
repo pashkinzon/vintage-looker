@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-950 antialiased text-slate-200">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Vinted Gem Alert Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 pb-20">
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="flex flex-col md:flex-row items-center justify-between py-6 gap-6 mb-8 border-b border-slate-700">
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-800 text-white p-4 rounded-2xl  ">
+                    <i class="fa-solid fa-gem text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black text-slate-100 tracking-tight">Vinted Gem Sniper</h1>
+                    <p class="text-sm font-medium text-slate-500 mt-1">Automated Price & Keyword Monitoring</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6  px-6 py-4 rounded-2xl  border border-slate-800 bg-slate-900/50">
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Engine Status</span>
+                    <div class="flex items-center gap-2">
+                        <div id="status-dot" class="w-3 h-3 rounded-full {{ 'bg-green-500 ' if state.running else 'bg-slate-600' }}"></div>
+                        <span id="status-text" class="font-bold text-sm {{ 'text-green-500' if state.running else 'text-slate-500' }}">
+                            {{ "ACTIVE" if state.running else "STOPPED" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="w-px h-10 bg-slate-700"></div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Gems Found</span>
+                    <div class="flex items-center gap-2 text-indigo-400">
+                        <i class="fa-solid fa-bell"></i>
+                        <span id="alert-count" class="font-black text-lg">{{ state.alerts_sent }}</span>
+                    </div>
+                </div>
+                <div class="w-px h-10 bg-slate-700 ml-2 hidden sm:block"></div>
+                <div class="ml-2">
+                    <button id="btn-start" onclick="startBot()" class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold rounded-xl   transition-all active:scale-95 {{ 'hidden' if state.running else '' }}">
+                        <i class="fa-solid fa-play"></i> Start
+                    </button>
+                    <button id="btn-stop" onclick="stopBot()" class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl   transition-all active:scale-95 {{ 'hidden' if not state.running else '' }}">
+                        <i class="fa-solid fa-stop"></i> Stop
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-8">
+                <!-- Settings Filter Card -->
+                <div class=" rounded-2xl  border border-slate-800 bg-slate-900/50 overflow-hidden">
+                    <div class="bg-slate-800/50 border-b border-slate-800/50 px-6 py-4 flex items-center gap-3">
+                        <div class="text-emerald-400"><i class="fa-solid fa-sliders"></i></div>
+                        <h3 class="text-lg font-bold text-slate-200">Global Configuration</h3>
+                    </div>
+                    <div class="p-6">
+                        <form onsubmit="updateSettings(event)" class="space-y-6">
+                            
+                            <div>
+                                <div class="flex justify-between">
+                                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Startup Freshness</label>
+                                    <span class="text-xs font-bold text-emerald-400" id="buffer-val">{{ state.buffer_mins }} mins</span>
+                                </div>
+                                <input type="range" id="buffer-range" min="5" max="1440" step="5" value="{{ state.buffer_mins }}" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="document.getElementById('buffer-val').innerText = this.value + ' mins'">
+                                <p class="text-[10px] text-slate-500 mt-1">On first run, bot captures ads not older than this buffer.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Price Limits (£)</label>
+                                <div class="flex items-center gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-slate-500 font-bold text-sm">Min</span>
+                                        </div>
+                                        <input type="number" id="min-price" value="{{ state.min_price }}" min="0" step="0.5" class="w-full bg-slate-800/20 border border-slate-700/50 hover:bg-slate-800/60 rounded-xl pl-12 pr-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-200">
+                                    </div>
+                                    <span class="text-slate-400 font-black">-</span>
+                                    <div class="relative flex-1">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-slate-500 font-bold text-sm">Max</span>
+                                        </div>
+                                        <input type="number" id="max-price" value="{{ state.max_price }}" min="0" step="0.5" class="w-full bg-slate-800/20 border border-slate-700/50 hover:bg-slate-800/60 rounded-xl pl-14 pr-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-200">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all   mt-2 hover:-translate-y-0.5">
+                                Save Constraints
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Negative Filters Card -->
+                <div class=" rounded-2xl  border border-slate-800 bg-slate-900/50 overflow-hidden">
+                    <div class="bg-rose-900/20 border-b border-rose-900/50 px-6 py-4 flex items-center gap-3">
+                        <div class="text-rose-500"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+                        <h3 class="text-lg font-bold text-slate-200">Excluded Words</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-slate-500 mb-4 leading-relaxed">Items containing any of these words in the title/desc will be ignored.</p>
+                        <div class="flex flex-wrap gap-2 mb-5">
+                            {% for neg in state.negative_filters %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-900/40 text-rose-300 text-sm font-medium border border-rose-700">
+                                {{ neg }}
+                                <button onclick="removeNegative('{{ neg }}')" class="hover:text-rose-200 opacity-60 hover:opacity-100 transition-opacity">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </span>
+                            {% else %}
+                            <span class="text-sm text-slate-500 italic">No exclusions set.</span>
+                            {% endfor %}
+                        </div>
+
+                        <form onsubmit="addNegative(event)" class="flex gap-2">
+                            <input type="text" id="new-negative" class="flex-1 bg-slate-800/20 border border-slate-700/50 hover:bg-slate-800/60 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm placeholder-slate-500 text-slate-200" placeholder="e.g. Broken">
+                            <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2.5 rounded-xl font-bold transition-colors  ">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-2">
+                <details class=" rounded-2xl  border border-slate-800 bg-slate-900/50 overflow-hidden h-full flex flex-col group" open>
+                    <summary class="bg-indigo-900/40 border-b border-indigo-800/60 px-6 py-4 flex items-center justify-between cursor-pointer focus:outline-none hover:bg-indigo-800/50 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                        <div class="flex items-center gap-3">
+                            <div class="text-indigo-400"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">Target Keywords / Searches <i class="fa-solid fa-chevron-down text-slate-500 text-sm transition-transform duration-300 group-open:rotate-180"></i></h3>
+                        </div>
+                        <span class="bg-indigo-800 text-indigo-200 text-xs font-bold px-2.5 py-1 rounded-md">{{ state.search_queries|length }} Active</span>
+                    </summary>
+                    
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between mb-6 gap-4">
+                            <p class="text-sm text-slate-400">The bot iterates through these queries repeatedly. Add robust, highly specific terms to catch the best lots.</p>
+                            <button onclick="clearQueries()" class="text-xs bg-rose-900/60 hover:bg-rose-900 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-800 transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/50 whitespace-nowrap">
+                                <i class="fa-solid fa-trash-can"></i> Clear All
+                            </button>
+                        </div>
+                        
+                        <div class="flex flex-col gap-4 mb-6">
+                            {% for link, items in state.grouped_queries.items() %}
+                            <div class="bg-slate-800/20 border border-slate-700/50 rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    {% set tags_list = [] %}
+                                    {% for item in items %}{% if item.tag %}{% set _ = tags_list.append(item.tag) %}{% endif %}{% endfor %}
+                                    {% set tags_str = tags_list|join(', ') %}
+                                    
+                                    {% if link == 'Standalone Keywords' %}
+                                    <i class="fa-solid fa-cube text-indigo-400"></i>
+                                    <span class="font-bold text-slate-300 flex-1">Standalone Keywords</span>
+                                    <button onclick="editTagsPrompt('{{ link|escape }}', '{{ tags_str|escape }}')" class="text-xs bg-indigo-900/40 hover:bg-indigo-700 text-indigo-200 px-2 py-1 rounded transition-colors whitespace-nowrap"><i class="fa-solid fa-pen-to-square"></i> Edit Words</button>
+                                    {% else %}
+                                    <i class="fa-solid fa-link text-emerald-400"></i>
+                                    <a href="{{ link }}" target="_blank" class="font-bold text-emerald-300 hover:underline truncate flex-1" title="{{ link }}">{{ link }}</a>
+                                    <button onclick="editTagsPrompt('{{ link|escape }}', '{{ tags_str|escape }}')" class="text-xs bg-emerald-900/40 hover:bg-emerald-700 text-emerald-200 px-2 py-1 rounded transition-colors whitespace-nowrap"><i class="fa-solid fa-pen-to-square"></i> Edit Tags</button>
+                                    {% endif %}
+                                </div>
+                                <div class="flex flex-wrap gap-2 pl-7">
+                                    {% for item in items %}
+                                    <div class="flex items-center gap-1.5 bg-slate-700/50 px-2 py-1 rounded-md border border-slate-600 text-xs font-medium text-slate-300">
+                                        {% if item.tag %}
+                                        <span>{{ item.tag }}</span>
+                                        {% else %}
+                                        <i class="fa-solid fa-globe text-slate-500" title="Whole Category"></i>
+                                        {% endif %}
+                                        <button onclick="removeQuery('{{ item.full }}')" class="hover:text-rose-400 ml-1 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="py-8 text-center text-slate-500 italic bg-slate-800/50 rounded-xl border border-slate-700 border-dashed">
+                                No target searches defined. Add one below to begin.
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-auto pt-6 border-t border-slate-800/50">
+                            <form onsubmit="addQuery(event)" class="flex flex-col gap-3">
+                                
+                                <div class="flex gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i class="fa-solid fa-link text-slate-500"></i>
+                                        </div>
+                                        <input type="text" id="new-query-link" class="w-full bg-slate-800/20 border border-slate-700/50 hover:bg-slate-800/60 rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-200" placeholder="Optional: Paste Vinted Category Link here...">
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
+                                        </div>
+                                        <input type="text" id="new-query-words" class="w-full bg-slate-800/20 border border-slate-700/50 hover:bg-slate-800/60 rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-200" placeholder="Search words or tags (e.g. vintage ring, necklace, watch)...">
+                                    </div>
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 rounded-xl font-bold transition-all   flex items-center gap-2">
+                                        <span>Add</span> <i class="fa-solid fa-plus text-sm"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 ml-1"><i class="fa-solid fa-circle-info text-indigo-400"></i> Tip: Use commas to batch-add multiple tags to the same URL.</p>
+                            </form>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <!-- Recent Gems / Notifications Section -->
+        <div id="recent-gems-section" class="mt-8  rounded-2xl  border border-slate-800 bg-slate-900/50 overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-950/40 to-teal-950/40 border-b border-emerald-800/50 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-emerald-400"><i class="fa-solid fa-gift"></i></div>
+                    <h3 class="text-lg font-bold text-slate-200">Recent Gems Found</h3>
+                    <span class="bg-emerald-800/60 text-emerald-200 text-xs font-bold px-2.5 py-1 rounded-md ml-2">{{ state.recent_gems|length }}</span>
+                    <!-- REFRESH CHECK -->
+                    <div class="hidden sm:block w-px h-6 bg-emerald-800/60 mx-2"></div>
+                    <div class="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-emerald-800/50">
+                        <i class="fa-solid fa-bolt text-emerald-400 text-xs"></i>
+                        <span class="text-xs font-bold text-emerald-200 tracking-wide uppercase">Next Check:</span>
+                        <span id="next-refresh-indicator" class="font-bold text-sm text-slate-400 ml-1">
+                            {% if not state.running %}
+                                -
+                            {% elif state.is_scraping %}
+                                <span class="text-indigo-500 animate-pulse">Scraping...</span>
+                            {% else %}
+                                <span class="countdown-timer text-amber-400" data-ts="{{ state.next_refresh_ts }}">Wait...</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <button onclick="forceRefresh(event)" class="ml-2 bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-colors duration-200 border border-emerald-600/50 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i> Scrape Now
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 text-sm">
+                    <button onclick="clearGems()" class="bg-rose-900/60 hover:bg-rose-900 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-800 transition-colors flex items-center gap-1.5 text-xs font-bold leading-tight">
+                        <i class="fa-solid fa-trash-can"></i> Clear Gems
+                    </button>
+                    <div class="w-px h-6 bg-emerald-800/60 mx-1"></div>
+                    <label class="font-semibold text-emerald-200"><i class="fa-solid fa-sort mr-1"></i> Sort:</label>
+                    <select id="gem-sort" onchange="sortGems()" class="bg-slate-900 border border-emerald-700 text-slate-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm font-medium">
+                        <option value="newest">Freshest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-6">
+                {% if state.recent_gems %}
+                <div id="gems-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for gem in state.recent_gems %}
+                    <a href="{{ gem.url }}" target="_blank" data-ts="{{ gem.timestamp }}" data-price="{{ gem.price_numeric }}" class="gem-card flex flex-col p-4 border border-slate-700 rounded-xl hover:border-emerald-600 hover: transition-all bg-slate-900 group">
+                        <!-- Top Row: Image & Title and Badges -->
+                        <div class="flex flex-row gap-4 mb-3">
+                            <div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-slate-800 relative">
+                                {% if gem.photo %}
+                                    <img src="{{ gem.photo }}" alt="Item Photo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center text-slate-400"><i class="fa-solid fa-image text-2xl"></i></div>
+                                {% endif %}
+                                <div class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[9px] px-1.5 py-0.5 rounded flex items-center gap-1">
+                                    <i class="fa-solid fa-heart text-rose-400"></i> {{ gem.favourite_count }}
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-sm font-bold text-slate-200 line-clamp-2 leading-tight" title="{{ gem.title }}">{{ gem.title }}</h4>
+                                </div>
+                                
+                                <div class="mt-2 flex flex-wrap gap-1.5">
+                                    {% if gem.brand_title %}
+                                    <span class="bg-slate-800 text-slate-500 text-[10px] font-bold px-1.5 py-0.5 rounded">{{ gem.brand_title }}</span>
+                                    {% endif %}
+                                    {% if gem.size_title %}
+                                    <span class="bg-indigo-900/40 text-indigo-300 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-800/60">{{ gem.size_title }}</span>
+                                    {% endif %}
+                                    {% if gem.condition_title %}
+                                    <span class="bg-emerald-900/40 text-emerald-300 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-800/50">{{ gem.condition_title }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mt-auto flex justify-between items-end">
+                                    <span class="bg-emerald-900/70 text-emerald-200 font-black text-sm px-2 py-0.5 rounded">{{ gem.price }}</span>
+                                    {% if gem.query_tag %}
+                                    {% set parts = gem.query_tag.split(' ', 1) %}
+                                    {% set is_url = 'vinted' in parts[0] and 'http' in parts[0] %}
+                                    {% set display_tag = parts[1] if (is_url and parts|length > 1) else (parts[0] if (not is_url and parts|length > 0) else 'Whole Category') %}
+                                    <span class="text-indigo-400 bg-indigo-900/30 border border-indigo-800/50 px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 max-w-[50%]" title="Found via: {{ gem.query_tag }}">
+                                        <i class="fa-solid fa-tag opacity-70"></i> 
+                                        <span class="truncate">{{ display_tag }}</span>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        {% if gem.description %}
+                        <p class="text-xs text-slate-500 line-clamp-2 mb-3 bg-slate-800/50 p-2 rounded border border-slate-800/50 italic">
+                            "{{ gem.description }}"
+                        </p>
+                        {% endif %}
+
+                        <!-- Bottom Row: Seller and Time -->
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold border-t border-slate-800/50 pt-2 mt-auto">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1 text-amber-500" title="Feedback rating">
+                                    {{ gem.seller_stars }}
+                                </span>
+                                {% if gem.status %}
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500">{{ gem.status }}</span>
+                                {% endif %}
+                            </div>
+                            <span class="gem-time relative group/tip cursor-help whitespace-nowrap">
+                                <i class="fa-regular fa-clock mr-1"></i> <span class="time-text">{{ gem.publish_date }}</span>
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="py-12 flex flex-col items-center justify-center text-slate-500">
+                    <i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-400"></i>
+                    <p>No gems found yet. Start the bot to begin hunting!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+        });
+
+        async function hitApi(url, method, data = null) {
+            let options = { method: method };
+            if (data) {
+                options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                options.body = new URLSearchParams(data);
+            }
+            try {
+                const response = await fetch(url, options);
+                return await response.json();
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'Network Error!' });
+                return null;
+            }
+        }
+
+        async function startBot() {
+            const res = await hitApi('/start', 'POST');
+            if (res) location.reload();
+        }
+
+        async function stopBot() {
+            const res = await hitApi('/stop', 'POST');
+            if (res) location.reload();
+        }
+
+        async function addQuery(e) {
+            e.preventDefault();
+            const linkInput = document.getElementById('new-query-link').value.trim();
+            const wordsInput = document.getElementById('new-query-words').value.trim();
+            
+            if (!linkInput && !wordsInput) return;
+
+            let queriesToSubmit = [];
+            
+            if (wordsInput) {
+                // Split by comma
+                const words = wordsInput.split(',').map(w => w.trim()).filter(w => w);
+                
+                if (linkInput) {
+                    queriesToSubmit = words.map(w => `${linkInput} ${w}`);
+                } else {
+                    queriesToSubmit = words;
+                }
+            } else if (linkInput) {
+                queriesToSubmit = [linkInput];
+            }
+
+            if (queriesToSubmit.length === 0) return;
+
+            // Submit loop via sequential API hits to avoid overwhelming logic, then reload once
+            for (let i = 0; i < queriesToSubmit.length; i++) {
+                await hitApi('/api/queries', 'POST', { query: queriesToSubmit[i] });
+            }
+            
+            location.reload();
+        }
+
+        async function removeQuery(query) {
+            const res = await hitApi('/api/queries/remove', 'POST', { query: query });
+            if (res) location.reload();
+        }
+
+        async function clearQueries() {
+            if (!confirm('Are you sure you want to clear all target keywords?')) return;
+            const res = await hitApi('/api/queries/clear', 'POST');
+            if (res) location.reload();
+        }
+        async function clearGems() {
+            const res = await hitApi('/api/gems/clear', 'POST');
+            if (res) location.reload();
+        }
+        async function addNegative(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-negative');
+            if (!input.value.trim()) return;
+            const res = await hitApi('/api/negatives', 'POST', { neg: input.value });
+            if (res) location.reload();
+        }
+
+        async function removeNegative(neg) {
+            const res = await hitApi('/api/negatives/remove', 'POST', { neg: neg });
+            if (res) location.reload();
+        }
+
+        async function updateSettings(e) {
+            e.preventDefault();
+            const minP = document.getElementById('min-price').value;
+            const maxP = document.getElementById('max-price').value;
+            const bufferRange = document.getElementById('buffer-range').value;
+            const res = await hitApi('/api/price', 'POST', { min_price: minP, max_price: maxP, buffer_mins: bufferRange });
+            if (res) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Bot Config saved!'
+                });
+            }
+        }
+        
+        // Auto-refresh the dashboard dynamically every 8 seconds
+        setInterval(async () => {
+            try {
+                // Fetch the new HTML and extract only the relevant parts
+                const response = await fetch(window.location.href);
+                if (!response.ok) return;
+                const text = await response.text();
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                
+                // 1. Update the recent gems grid safely
+                const newGemsHtml = doc.getElementById('recent-gems-section').innerHTML;
+                document.getElementById('recent-gems-section').innerHTML = newGemsHtml;
+                
+                // re-apply active sort & relative times if elements changed
+                sortGems();
+                updateRelativeTimes();
+                
+                // 2. Update stats and counts across header
+                document.getElementById('alert-count').innerText = doc.getElementById('alert-count').innerText;
+                document.getElementById('status-text').innerText = doc.getElementById('status-text').innerText;
+                document.getElementById('status-text').className = doc.getElementById('status-text').className;
+                document.getElementById('status-dot').className = doc.getElementById('status-dot').className;
+                document.getElementById('next-refresh-indicator').innerHTML = doc.getElementById('next-refresh-indicator').innerHTML;
+                
+            } catch (err) {
+                console.error("Auto refresh failed", err);
+            }
+        }, 8000);
+
+        function tickCountdown() {
+            const el = document.querySelector('.countdown-timer');
+            if (!el) return;
+            const ts = parseFloat(el.getAttribute('data-ts'));
+            if (!ts) return;
+
+            const now = Math.floor(Date.now() / 1000);
+            const diff = Math.max(0, Math.floor(ts - now));
+            el.innerText = `in ${diff}s`;
+        }
+
+        setInterval(tickCountdown, 1000);
+
+        function updateRelativeTimes() {
+            const now = Math.floor(Date.now() / 1000);
+            document.querySelectorAll('.gem-card').forEach(card => {
+                const ts = parseFloat(card.getAttribute('data-ts'));
+                if (!ts) return;
+                const diff = now - ts;
+                let text = "just now";
+                if (diff > 86400) text = Math.floor(diff/86400) + "d ago";
+                else if (diff > 3600) text = Math.floor(diff/3600) + "h ago";
+                else if (diff > 60) text = Math.floor(diff/60) + "m ago";
+                
+                const timeSpan = card.querySelector('.time-text');
+                if(timeSpan) timeSpan.innerText = text;
+            });
+        }
+
+        function sortGems() {
+            const grid = document.getElementById('gems-grid');
+            if(!grid) return;
+            const sortType = document.getElementById('gem-sort')?.value || 'newest';
+            const cards = Array.from(grid.querySelectorAll('.gem-card'));
+            
+            cards.sort((a, b) => {
+                const tsA = parseFloat(a.getAttribute('data-ts')) || 0;
+                const tsB = parseFloat(b.getAttribute('data-ts')) || 0;
+                const pA = parseFloat(a.getAttribute('data-price')) || 0;
+                const pB = parseFloat(b.getAttribute('data-price')) || 0;
+                
+                if (sortType === 'newest') return tsB - tsA;
+                if (sortType === 'oldest') return tsA - tsB;
+                if (sortType === 'price-low') return pA - pB;
+                if (sortType === 'price-high') return pB - pA;
+                return 0;
+            });
+            
+            cards.forEach(card => grid.appendChild(card)); // re-append to re-order
+        }
+
+        // Initialize sort and times on page load
+        sortGems();
+        updateRelativeTimes();
+        setInterval(updateRelativeTimes, 60000); // refresh relative strings mapping every 1 min
+        
+        async function editTagsPrompt(linkUrl, tagsStr) {
+            const isStandalone = linkUrl === 'Standalone Keywords';
+            const { value: newTags } = await Swal.fire({
+                title: isStandalone ? 'Edit Standalone Keywords' : 'Edit Tags for Link',
+                html: `<p class="text-sm text-slate-400 mb-4">Edit keywords ${isStandalone ? 'below' : 'for this link'}. Products will alert if they match <b>at least one</b> of these tags.</p>
+                       ${!isStandalone ? `<div class="text-left mb-2"><label class="text-xs text-indigo-400 font-bold">Category Link:</label><br><span class="text-xs text-slate-500 break-all">${linkUrl}</span></div>` : ''}`,
+                input: 'textarea',
+                inputValue: tagsStr,
+                inputPlaceholder: 'e.g. vintage ring, necklace, retro ...',
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                confirmButtonColor: '#4f46e5',
+                background: '#1e293b',
+                color: '#f8fafc',
+                customClass: { input: 'bg-slate-900 border-slate-700 text-slate-200 text-sm h-24' }
+            });
+
+            if (newTags !== undefined) {
+                const formData = new FormData();
+                formData.append('link', linkUrl);
+                formData.append('tags', newTags);
+                
+                await fetch('/api/queries/replace', {
+                    method: 'POST',
+                    body: formData
+                });
+                location.reload();
+            }
+        }
+
+        function fillLinkForm(linkUrl) {
+            document.getElementById('new-query-link').value = linkUrl;
+            document.getElementById('new-query-words').focus();
+        }
+
+        async function forceRefresh() {
+            try {
+                const btn = event.currentTarget;
+                const icon = btn.querySelector('i');
+                icon.classList.add('fa-spin');
+                const resp = await fetch('/api/queries/refresh', { method: 'POST' });
+                const json = await resp.json();
+                if (json.status === 'error') {
+                    Swal.fire({icon: 'error', title: 'Oops...', text: json.message, background: '#1e293b', color: '#f8fafc'});
+                } else {
+                    const toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#059669', color: '#fff'});
+                    toast.fire({icon: 'success', title: 'Forcing scrape cycle...'});
+                }
+                setTimeout(() => icon.classList.remove('fa-spin'), 1500);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>

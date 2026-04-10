@@ -1,0 +1,17 @@
+# Environments
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Local Data
+*.db
+items.db
+
+# Secrets
+.env
+.env.local
+
+# OS
+.DS_Store
