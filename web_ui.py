@@ -56,8 +56,12 @@ class BotState:
         for q in self.search_queries:
             parts = q.split(' ', 1)
             is_url = parts[0].startswith("http") and "vinted" in parts[0]
-            link = parts[0] if is_url else "Standalone Keywords"
-            tag = parts[1] if len(parts) > 1 else ("" if is_url else parts[0])
+            if is_url:
+                link = parts[0]
+                tag = parts[1] if len(parts) > 1 else ""
+            else:
+                link = "Standalone Keywords"
+                tag = q
             
             if link not in grouped:
                 grouped[link] = []
